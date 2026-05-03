@@ -6,7 +6,7 @@ Based on OpenZeppelin patterns — no external dependencies on-chain.
 ERC20_SOURCE = """// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-/// @title TokenForgeERC20 — Fungible Token
+/// @title TokenForgeERC20 -- Fungible Token
 /// @notice A minimal ERC-20 implementation with mint-on-deploy.
 contract TokenForgeERC20 {
     string public name;
@@ -63,8 +63,8 @@ contract TokenForgeERC20 {
 ERC721_SOURCE = """// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-/// @title TokenForgeERC721 — Non‑Fungible Token
-/// @notice A minimal ERC-721 implementation with on‑demand minting.
+/// @title TokenForgeERC721 -- Non-Fungible Token
+/// @notice A minimal ERC-721 implementation with on-demand minting.
 contract TokenForgeERC721 {
     string public name;
     string public symbol;
