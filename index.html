@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokenForge — Open Source Blockchain Asset Tokenizer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  ::selection { background: #00d2ff; color: #0a0a0f; }
+
+  /* ── Nav ───────────────────────────────────────── */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    padding: 16px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    backdrop-filter: blur(12px);
+    background: rgba(10,10,15,0.85);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  nav .logo { font-size: 1.3rem; font-weight: 700; color: #00d2ff; letter-spacing: -0.5px; }
+  nav .links { display: flex; gap: 32px; }
+  nav .links a { color: #a0a0b0; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+  nav .links a:hover { color: #00d2ff; }
+  nav .btn { background: #00d2ff; color: #0a0a0f; padding: 8px 20px; border-radius: 6px; font-weight: 600; text-decoration: none; font-size: 0.9rem; }
+
+  /* ── Hero ──────────────────────────────────────── */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(0,210,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero .pre { font-size: 4rem; font-weight: 900; color: #00d2ff; letter-spacing: -1px; font-family: 'Courier New', monospace; }
+  .hero h1 { font-size: 3.5rem; font-weight: 800; margin: 16px 0; line-height: 1.1; }
+  .hero h1 span { background: linear-gradient(135deg, #00d2ff, #00ffaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { font-size: 1.2rem; color: #808090; max-width: 600px; margin-bottom: 40px; }
+  .hero .cta { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .btn-primary {
+    background: linear-gradient(135deg, #00d2ff, #0088cc);
+    color: #fff; padding: 14px 36px; border-radius: 8px;
+    font-weight: 700; text-decoration: none; font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 24px rgba(0,210,255,0.25);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,210,255,0.35); }
+  .btn-secondary {
+    background: rgba(255,255,255,0.06); color: #c0c0d0;
+    padding: 14px 36px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+    font-weight: 600; text-decoration: none; font-size: 1rem;
+    transition: background 0.2s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+  /* ── Sections ─────────────────────────────────── */
+  section { padding: 100px 48px; max-width: 1100px; margin: 0 auto; }
+  section h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 16px; color: #fff; }
+  section h2 span { color: #00d2ff; }
+  section .sub { color: #707080; font-size: 1.05rem; margin-bottom: 48px; max-width: 600px; }
+
+  /* ── Grid ─────────────────────────────────────── */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+  .card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 32px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: rgba(0,210,255,0.3); transform: translateY(-3px); }
+  .card .icon { font-size: 1.8rem; margin-bottom: 16px; }
+  .card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; color: #fff; }
+  .card p { color: #808090; font-size: 0.92rem; }
+
+  /* ── Code Block ───────────────────────────────── */
+  .code-block {
+    background: #0d0d15; border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 32px; font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+    font-size: 0.88rem; line-height: 1.8; color: #c0c0d0;
+    overflow-x: auto; position: relative;
+    box-shadow: 0 0 0 1px rgba(0,210,255,0.08), 0 24px 48px rgba(0,0,0,0.4);
+  }
+  .code-block .token { color: #00d2ff; }
+  .code-block .comment { color: #505060; }
+  .code-block .str { color: #00ffaa; }
+  .code-block .chain { color: #ffaa00; }
+  .code-block::before {
+    content: '▎'; color: #00d2ff; position: absolute; left: 16px;
+    top: 14px; font-size: 2rem; animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ── Chains ───────────────────────────────────── */
+  .chains { display: flex; gap: 16px; flex-wrap: wrap; }
+  .chain {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px; padding: 12px 20px; font-size: 0.9rem; color: #c0c0d0;
+    display: flex; align-items: center; gap: 10px; transition: border-color 0.2s;
+  }
+  .chain:hover { border-color: rgba(0,210,255,0.3); }
+  .chain .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .chain .dot.eth { background: #627eea; }
+  .chain .dot.poly { background: #8247e5; }
+  .chain .dot.arb { background: #28a0f0; }
+  .chain .dot.base { background: #0052ff; }
+  .chain .dot.custom { background: #00d2ff; }
+
+  /* ── Steps ────────────────────────────────────── */
+  .steps { display: flex; gap: 24px; flex-wrap: wrap; counter-reset: step; }
+  .step {
+    flex: 1; min-width: 180px; position: relative; padding-top: 48px;
+    text-align: center;
+  }
+  .step::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #00d2ff, #0088cc);
+    color: #0a0a0f; font-weight: 700; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step h4 { color: #fff; margin-bottom: 6px; font-size: 0.95rem; }
+  .step p { color: #707080; font-size: 0.85rem; }
+
+  /* ── Roadmap ──────────────────────────────────── */
+  .roadmap-item {
+    display: flex; gap: 16px; align-items: flex-start; padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .roadmap-item .check { color: #00ffaa; font-weight: 700; min-width: 24px; }
+  .roadmap-item .pending { color: #505060; min-width: 24px; }
+  .roadmap-item .label { color: #c0c0d0; }
+  .roadmap-item .badge {
+    font-size: 0.75rem; padding: 2px 8px; border-radius: 4px;
+    margin-left: 12px; font-weight: 600;
+  }
+  .badge.done { background: rgba(0,255,170,0.12); color: #00ffaa; }
+  .badge.next { background: rgba(0,210,255,0.12); color: #00d2ff; }
+  .badge.plan { background: rgba(255,255,255,0.05); color: #707080; }
+
+  /* ── Footer ───────────────────────────────────── */
+  footer {
+    text-align: center; padding: 48px 24px; color: #505060;
+    border-top: 1px solid rgba(255,255,255,0.04); font-size: 0.85rem;
+  }
+  footer a { color: #808090; text-decoration: none; }
+  footer a:hover { color: #00d2ff; }
+
+  /* ── Responsive ───────────────────────────────── */
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    nav .links { display: none; }
+    section { padding: 80px 24px; }
+    .hero .pre { font-size: 2.5rem; }
+    .hero h1 { font-size: 2.2rem; }
+    .code-block { padding: 24px 16px; font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">▎TokenForge</div>
+  <div class="links">
+    <a href="#what">What</a>
+    <a href="#how">How</a>
+    <a href="#standards">Standards</a>
+    <a href="#roadmap">Roadmap</a>
+  </div>
+  <a href="https://github.com/Alejandro04/TokenForge" class="btn">GitHub</a>
+</nav>
+
+<!-- ════════════════ HERO ════════════════ -->
+<section class="hero">
+  <div class="pre">TokenForge</div>
+  <h1>Tokenize <span>real-world assets</span><br>from your terminal</h1>
+  <p>
+    An open-source CLI tool to deploy ERC-20 and ERC-721 tokens
+    on any EVM blockchain. No dashboards, no fees, no vendor lock-in.
+  </p>
+  <div class="cta">
+    <a href="#how" class="btn-primary">Get Started</a>
+    <a href="#what" class="btn-secondary">Learn More</a>
+  </div>
+</section>
+
+<!-- ════════════════ WHAT ════════════════ -->
+<section id="what">
+  <h2>What is <span>TokenForge?</span></h2>
+  <p class="sub">
+    A Python CLI wizard that asks 5 questions and deploys your token contract
+    directly to Ethereum, Polygon, Arbitrum, Base — or any EVM chain.
+  </p>
+  <div class="grid">
+    <div class="card">
+      <div class="icon">🔓</div>
+      <h3>Open Source</h3>
+      <p>MIT licensed. Read every line of the Solidity contracts and Python code. No black boxes.</p>
+    </div>
+    <div class="card">
+      <div class="icon">⛓️</div>
+      <h3>Multi-Chain</h3>
+      <p>Same script, same contracts. Deploy to 6 pre-configured networks or custom RPC.</p>
+    </div>
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h3>Terminal-First</h3>
+      <p>No web forms. No SaaS subscriptions. A clean interactive wizard that takes under 60 seconds.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🛡️</div>
+      <h3>You Own It</h3>
+      <p>Your private key, your contract, your supply. No platform can freeze or revoke your tokens.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📜</div>
+      <h3>Auditable</h3>
+      <p>Minimal Solidity based on OpenZeppelin patterns. Bytecode matches source — verify on Etherscan in one click.</p>
+    </div>
+    <div class="card">
+      <div class="icon">💰</div>
+      <h3>Free Forever</h3>
+      <p>Platforms charge $500–$5,000 per deployment. TokenForge costs nothing. Just pay blockchain gas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ CODE ════════════════ -->
+<section>
+  <h2>See it <span>in action</span></h2>
+  <p class="sub">Five questions. One deployment. Under 60 seconds.</p>
+  <div class="code-block" style="padding-left:56px;">
+<span class="token">$</span> python tokenforge.py<br><br>
+<span class="chain">Select network:</span><br>
+  <span class="token">[1]</span> Sepolia Testnet<br>
+  <span class="token">[2]</span> Amoy Testnet (Polygon)<br>
+  <span class="token">[3]</span> Ethereum Mainnet<br>
+  <span class="token">[4]</span> Polygon Mainnet<br>
+  <span class="token">[5]</span> Arbitrum One<br>
+  <span class="token">[6]</span> Base<br>
+  &gt; <span class="token">1</span><br><br>
+<span class="chain">Token standard:</span><br>
+  <span class="token">[1]</span> ERC-20  -- Fungible Token<br>
+  <span class="token">[2]</span> ERC-721 -- Non-Fungible Token<br>
+  &gt; <span class="token">1</span><br><br>
+<span class="chain">ERC-20 Token Parameters:</span><br>
+  Token name: <span class="str">TokenForge Gold</span><br>
+  Symbol:     <span class="str">TFG</span><br>
+  Decimals:   <span class="token">18</span><br>
+  Supply:     <span class="token">1_000_000</span><br>
+  Private key: <span class="comment">0x••••••••••••••••</span><br><br>
+<span class="str">[OK] Token deployed successfully!</span><br>
+  Contract Address:  <span class="str">0x6391...eEc3</span><br>
+  Explorer:          <span class="str">sepolia.etherscan.io/address/0x6391...</span>
+  </div>
+</section>
+
+<!-- ════════════════ HOW ════════════════ -->
+<section id="how">
+  <h2>How it <span>works</span></h2>
+  <p class="sub">From source code to on-chain token in four steps.</p>
+  <div class="steps">
+    <div class="step">
+      <h4>Write Parameters</h4>
+      <p>Name your token, choose a symbol, set decimals and initial supply.</p>
+    </div>
+    <div class="step">
+      <h4>Compile Solidity</h4>
+      <p>TokenForge compiles the ERC-20 or ERC-721 source locally using solc v0.8.20.</p>
+    </div>
+    <div class="step">
+      <h4>Sign & Broadcast</h4>
+      <p>Your private key signs the deployment transaction. Gas is estimated automatically.</p>
+    </div>
+    <div class="step">
+      <h4>Token Is Live</h4>
+      <p>The contract address appears. Verify on Etherscan. Start transferring.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ STANDARDS ════════════════ -->
+<section id="standards">
+  <h2>Supported <span>Standards</span></h2>
+  <p class="sub">From simple tokens to permissioned securities.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="icon">🪙</div>
+      <h3>ERC-20 &nbsp;<span class="badge done">LIVE</span></h3>
+      <p>Fungible tokens. Currencies, shares, loyalty points, commodities. Full supply minted to deployer on creation.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🖼️</div>
+      <h3>ERC-721 &nbsp;<span class="badge done">LIVE</span></h3>
+      <p>Non-fungible tokens. Real estate, invoices, art, certificates. Mint-on-demand with per-token metadata URI.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🏦</div>
+      <h3>ERC-3643 &nbsp;<span class="badge next">NEXT</span></h3>
+      <p>Permissioned security tokens. On-chain identity whitelisting, transfer restrictions, forced transfers for compliance.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🎮</div>
+      <h3>ERC-1155 &nbsp;<span class="badge plan">PLANNED</span></h3>
+      <p>Multi-token standard. One contract for both fungible and non-fungible tokens. Ideal for gaming and bundled assets.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📈</div>
+      <h3>ERC-4626 &nbsp;<span class="badge plan">PLANNED</span></h3>
+      <p>Tokenized vaults. Yield-bearing assets like treasury bills, staking positions, and interest-bearing accounts.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔌</div>
+      <h3>Custom &nbsp;<span class="badge plan">PLANNED</span></h3>
+      <p>Plugin system for custom token logic. Extend TokenForge with your own Solidity modules.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ CHAINS ════════════════ -->
+<section>
+  <h2>Deploy to <span>any EVM chain</span></h2>
+  <p class="sub">Pre-configured networks + custom RPC support.</p>
+  <div class="chains">
+    <div class="chain"><span class="dot eth"></span> Ethereum</div>
+    <div class="chain"><span class="dot poly"></span> Polygon</div>
+    <div class="chain"><span class="dot arb"></span> Arbitrum</div>
+    <div class="chain"><span class="dot base"></span> Base</div>
+    <div class="chain"><span class="dot eth"></span> Sepolia Testnet</div>
+    <div class="chain"><span class="dot poly"></span> Amoy Testnet</div>
+    <div class="chain"><span class="dot custom"></span> Custom RPC</div>
+  </div>
+</section>
+
+<!-- ════════════════ ROADMAP ════════════════ -->
+<section id="roadmap">
+  <h2><span>Roadmap</span></h2>
+  <p class="sub">What's built, what's next.</p>
+  <div class="roadmap-item"><span class="check">✓</span><span class="label">ERC-20 deployment wizard</span><span class="badge done">DONE</span></div>
+  <div class="roadmap-item"><span class="check">✓</span><span class="label">ERC-721 deployment wizard</span><span class="badge done">DONE</span></div>
+  <div class="roadmap-item"><span class="check">✓</span><span class="label">Multi-chain support (6 networks + custom RPC)</span><span class="badge done">DONE</span></div>
+  <div class="roadmap-item"><span class="check">✓</span><span class="label">Contract verification on Etherscan</span><span class="badge done">DONE</span></div>
+  <div class="roadmap-item"><span class="check">✓</span><span class="label">Wallet generation utility</span><span class="badge done">DONE</span></div>
+  <div class="roadmap-item"><span class="pending">○</span><span class="label">ERC-3643 (T-REX) security token standard</span><span class="badge next">NEXT</span></div>
+  <div class="roadmap-item"><span class="pending">○</span><span class="label">Batch minting for NFTs</span><span class="badge plan">PLANNED</span></div>
+  <div class="roadmap-item"><span class="pending">○</span><span class="label">IPFS metadata upload helper</span><span class="badge plan">PLANNED</span></div>
+  <div class="roadmap-item"><span class="pending">○</span><span class="label">ERC-1155 multi-token standard</span><span class="badge plan">PLANNED</span></div>
+  <div class="roadmap-item"><span class="pending">○</span><span class="label">ERC-4626 vault standard</span><span class="badge plan">PLANNED</span></div>
+  <div class="roadmap-item"><span class="pending">○</span><span class="label">Multi-sig deployment (Safe / Gnosis)</span><span class="badge plan">PLANNED</span></div>
+  <div class="roadmap-item"><span class="pending">○</span><span class="label">Plugin system for custom token logic</span><span class="badge plan">PLANNED</span></div>
+  <div class="roadmap-item"><span class="pending">○</span><span class="label">Unit test suite & CI/CD pipeline</span><span class="badge plan">PLANNED</span></div>
+</section>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<footer>
+  <p>TokenForge &middot; MIT Licensed &middot; Built with Python, Solidity, and the belief that tokenization should be free.</p>
+  <p style="margin-top:8px;">
+    <a href="https://github.com/Alejandro04/TokenForge">GitHub</a> &middot;
+    <a href="https://www.linkedin.com/in/alejandroroa">LinkedIn</a>
+  </p>
+</footer>
+
+</body>
+</html>
