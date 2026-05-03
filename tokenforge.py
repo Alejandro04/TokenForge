@@ -31,7 +31,7 @@ RESET = "\033[0m"
 
 NETWORKS = {
     "Sepolia Testnet": {
-        "rpc": "https://rpc.sepolia.org",
+        "rpc": "https://ethereum-sepolia-rpc.publicnode.com",
         "chain_id": 11155111,
         "explorer": "https://sepolia.etherscan.io",
     },
