@@ -1,19 +1,19 @@
 <div align="center">
 
 ```
-╔══════════════════════════════════════════════════════════╗
-║   ████████╗ ██████╗ ██╗  ██╗███████╗███╗   ██╗          ║
-║   ╚══██╔══╝██╔═══██╗██║ ██╔╝██╔════╝████╗  ██║          ║
-║      ██║   ██║   ██║█████╔╝ █████╗  ██╔██╗ ██║          ║
-║      ██║   ██║   ██║██╔═██╗ ██╔══╝  ██║╚██╗██║          ║
-║      ██║   ╚██████╔╝██║  ██╗███████╗██║ ╚████║          ║
-║      ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝          ║
-╚══════════════════════════════════════════════════════════╝
-</div>
+   _______    _             _______
+  |__   __|  | |           |__   __|
+     | | ___ | | _____ _ __   | | ___  _ __ __ _  ___
+     | |/ _ \| |/ / _ \ '_ \  | |/ _ \| '__/ _` |/ _ \
+     | | (_) |   <  __/ | | | | | (_) | | | (_| |  __/
+     |_|\___/|_|\_\___|_| |_| |_|\___/|_|  \__, |\___|
+                                             __/ |
+                                            |___/
+```
 
 ---
 
-**Tokenize real‑world assets on any EVM blockchain — from the command line.**
+**Tokenize real-world assets on any EVM blockchain — from the command line.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-green.svg)](https://python.org)
@@ -105,11 +105,18 @@ tokenforge/
 ├── requirements.txt
 ├── .gitignore
 ├── README.md
-└── forge/
-    ├── __init__.py          # Package metadata
-    ├── contracts.py          # Solidity source code (ERC‑20 & ERC‑721)
-    ├── compiler.py           # solc compilation wrapper
-    └── deployer.py           # Web3 deployment logic
+├── index.html               # Landing page
+├── forge/
+│   ├── __init__.py          # Package metadata
+│   ├── contracts.py         # Solidity source code (ERC-20 & ERC-721)
+│   ├── compiler.py          # solc compilation wrapper
+│   └── deployer.py          # Web3 deployment logic
+├── wallet/
+│   ├── new_wallet.py        # Test wallet generator
+│   └── README.md
+└── verifyContract/
+    ├── verify_contract.py   # Etherscan verification tool
+    └── README.md
 ```
 
 ```
@@ -203,10 +210,11 @@ and complying with applicable regulations.
 - [x] ERC‑20 deployment wizard
 - [x] ERC‑721 deployment wizard
 - [x] Multi‑chain support (6 networks + custom RPC)
+- [x] Contract verification (Etherscan)
+- [x] Wallet generation utility
 - [ ] ERC‑3643 (T‑REX) security token standard
-- [ ] Batch minting UI (mint many NFTs at once)
 - [ ] IPFS metadata upload helper
-- [ ] Contract verification script (Etherscan / Sourcify)
+- [ ] Batch minting UI (mint many NFTs at once)
 - [ ] ERC‑1155 multi‑token standard
 - [ ] ERC‑4626 vault standard
 - [ ] Multi‑sig deployment support (Safe / Gnosis)
